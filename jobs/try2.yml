@@ -1,0 +1,60 @@
+# --exp_name list: co-seg[ablation], co-seg[low_quality], co-seg[high_quality], co-seg[few_supervision], co-seg[pseudo_label]
+# --data_set list: voc, city
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lq-1323-try3
+  namespace: aiml-javen-research
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: lq-1323-try3
+          image: docker.aiml.team/yuhao.lin/dadie2:latest
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: gcp-credentials
+              mountPath: /etc/gcp
+              readOnly: true
+            - mountPath: /dev/shm
+              name: shared-memory-hack
+          command: 
+           [
+              "python", "VocCode/main.py",
+              "--gcloud",
+              "--ddp",
+              "--gpus=2",
+              "--backbone=101",
+              "--batch_size=8",
+              "--labeled_examples=92",
+              "--learning-rate=2.5e-3",
+              "--warm_up=5",
+              "--semi_p_th=0.6",
+              "--semi_n_th=0.",
+              "--epochs=80",
+           ]
+          resources:
+            limits:
+              nvidia.com/gpu: 2
+              memory: 80Gi
+              cpu: 8000m
+            requests:
+              memory: 80Gi
+              cpu: 8000m
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/gcp/credentials.json
+
+      volumes:
+        - name: gcp-credentials
+          secret:
+            secretName: gcp
+            items:
+              - key: data-manager
+                path: credentials.json
+        - name: shared-memory-hack
+          emptyDir:
+            medium: Memory
+
