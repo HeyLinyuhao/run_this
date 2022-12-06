@@ -1,6 +1,6 @@
 {
-    "name": "PS-MT(VOC12)",
-    "experim_name": "lq-new-idea-plus-dadie2",
+    "name": "VOC-China",
+    "experim_name": "China",
     "n_labeled_examples": 1323,
     "ramp_up": 12,
     "unsupervised_w": 1.5,
